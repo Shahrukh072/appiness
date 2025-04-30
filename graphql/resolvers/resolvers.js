@@ -92,13 +92,13 @@ module.exports = {
                   from: 'products',
                   localField: 'products.productId',
                   foreignField: '_id',
-                  as: 'product'
+                  as: 'productDetails'
                 }
               },
-              { $unwind: '$product' },
+              { $unwind: '$productDetails' },
               {
                 $group: {
-                  _id: '$product.category',
+                  _id: '$productDetails.category',
                   revenue: {
                     $sum: {
                       $multiply: ['$products.quantity', '$products.priceAtPurchase']
@@ -164,7 +164,7 @@ module.exports = {
         totalAmount += priceAtPurchase * p.quantity;
   
         enrichedProducts.push({
-          productId: p.productId,
+          productId: new mongoose.Types.ObjectId(p.productId), // ✅ convert to ObjectId
           quantity: p.quantity,
           priceAtPurchase
         });

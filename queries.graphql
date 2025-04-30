@@ -20,7 +20,7 @@ query {
 
 # Sales Analytics
 query {
-  getSalesAnalytics(startDate: "2024-01-01", endDate: "2024-04-01") {
+  getSalesAnalytics(startDate: "2025-04-01", endDate: "2025-05-01") {
     totalRevenue
     completedOrders
     categoryBreakdown {
@@ -30,7 +30,8 @@ query {
   }
 }
 
-# Pagination Example
+
+# Pagination 
 query {
   getCustomerOrders(customerId: "CUSTOMER_ID_HERE", limit: 5, offset: 0) {
     _id
