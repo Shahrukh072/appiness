@@ -25,7 +25,7 @@ module.exports = {
         customerId,
         totalSpent: result[0].totalSpent,
         averageOrderValue: result[0].averageOrderValue,
-        lastOrderDate: result[0].lastOrderDate.toISOString()
+        lastOrderDate: new Date(result[0].lastOrderDate).toISOString()
       };
     },
 
@@ -36,7 +36,11 @@ module.exports = {
         {
           $group: {
             _id: '$products.productId',
-            totalSold: { $sum: '$products.quantity' }
+            totalSold: { 
+              $sum: {
+                $multiply: ["$products.quantity", "$products.priceAtPurchase"] // Total revenue
+              }
+            }
           }
         },
         { $sort: { totalSold: -1 } },
@@ -135,29 +139,37 @@ module.exports = {
   },
 
   Mutation: {
+    async createManyCustomers(_, { input }) {
+      return await Customer.insertMany(input);
+    },
+  
+    async createManyProducts(_, { input }) {
+      return await Product.insertMany(input);
+    },
+  
     async placeOrder(_, { customerId, products }) {
       let totalAmount = 0;
       const enrichedProducts = [];
-
+  
       for (const p of products) {
         const product = await Product.findById(p.productId);
         if (!product || product.stock < p.quantity) {
-          throw new Error(`Insufficient stock for product: ${p.productId}`);
+          throw new Error(`Invalid or insufficient stock for product: ${p.productId}`);
         }
-
+  
         product.stock -= p.quantity;
         await product.save();
-
+  
         const priceAtPurchase = product.price;
         totalAmount += priceAtPurchase * p.quantity;
-
+  
         enrichedProducts.push({
           productId: p.productId,
           quantity: p.quantity,
           priceAtPurchase
         });
       }
-
+  
       const order = new Order({
         customerId,
         products: enrichedProducts,
@@ -165,9 +177,9 @@ module.exports = {
         orderDate: new Date(),
         status: 'completed'
       });
-
-      await order.save();
-      return order;
+  
+      return await order.save();
     }
-  } 
+  }
+  
 };

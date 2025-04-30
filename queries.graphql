@@ -1,0 +1,55 @@
+#Customer Spending
+query {
+  getCustomerSpending(customerId: "CUSTOMER_ID_HERE") {
+    customerId
+    totalSpent
+    averageOrderValue
+    lastOrderDate
+  }
+}
+
+
+# Top Selling Products
+query {
+  getTopSellingProducts(limit: 2) {
+    productId
+    name
+    totalSold
+  }
+}
+
+# Sales Analytics
+query {
+  getSalesAnalytics(startDate: "2024-01-01", endDate: "2024-04-01") {
+    totalRevenue
+    completedOrders
+    categoryBreakdown {
+      category
+      revenue
+    }
+  }
+}
+
+# Pagination Example
+query {
+  getCustomerOrders(customerId: "CUSTOMER_ID_HERE", limit: 5, offset: 0) {
+    _id
+    totalAmount
+    orderDate
+  }
+}
+
+# Place Order Mutation
+mutation {
+  placeOrder(
+    customerId: "CUSTOMER_ID_HERE",
+    products: [
+      { productId: "PRODUCT_ID_1", quantity: 2 },
+      { productId: "PRODUCT_ID_2", quantity: 1 }
+    ]
+  ) {
+    _id
+    totalAmount
+    orderDate
+  }
+}
